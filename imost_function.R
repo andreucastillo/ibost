@@ -21,9 +21,9 @@ load_database <- function(path = "database"){
     community[[i]] <- read_excel(files[i], sheet = "community")
     environment[[i]] <- read_excel(files[i], sheet = "environment")
     taxonomy[[i]] <- read_excel(files[i], sheet = "taxonomy")
-    taxonomy[[i]]$source <- unique(sample[[i]]$source)
+    taxonomy[[i]]$datasetID <- unique(sample[[i]]$datasetID)
     sample[[i]]$eventDate <- as.Date(sample[[i]]$eventDate)
-    sample[[i]]$lastModification <- as.Date(sample[[i]]$lastModification)
+    sample[[i]]$modified <- as.Date(sample[[i]]$modified)
   }
   data <- list("sample" = sample, "community" = community, "environment" = environment, "taxonomy" = taxonomy)
   return(data)
@@ -35,10 +35,10 @@ taxon_rev <- function(community, taxonomy){
   require(tidyr)
   community_rev <- community
   for(i in 1:length(community_rev)){
-    colnames(community_rev[[i]]) <- c("sampleID", taxonomy[[i]]$speciesIDRev)
+    colnames(community_rev[[i]]) <- c("eventID", taxonomy[[i]]$speciesIDRev)
     community_rev[[i]] <- pivot_longer(community_rev[[i]], cols = colnames(community_rev[[i]])[-1])
     community_rev[[i]] <- community_rev[[i]] %>%
-      group_by(sampleID, name) %>%
+      group_by(eventID, name) %>%
       summarise_at(vars(value), sum, na.rm = TRUE)
     community_rev[[i]] <- pivot_wider(community_rev[[i]], names_from = name, values_from = value)
   }
@@ -71,11 +71,11 @@ join_dataset <- function(sample, community, environment, taxonomy, format = "wid
         data[[i]] <- pivot_longer(community[[i]], cols = colnames(community[[i]])[-1])
         data[[i]] <- data[[i]][!is.na(data[[i]]$value),]
         colnames(data[[i]])[2] <- "speciesID"
-        data[[i]] <- right_join(data[[i]], taxonomy[[i]][,1:14], by = "speciesID")
+        data[[i]] <- right_join(data[[i]], taxonomy[[i]][,1:13], by = "speciesID")
       }
       data <- bind_rows(data)
-      data <- tibble(occurrenceID = paste("IMOST", data$sampleID, data$speciesID, sep = "_"), data)
-      data <- right_join(data, sample_full, by = "sampleID")
+      data <- tibble(occurrenceID = paste("IMOST", data$eventID, data$speciesID, sep = "_"), data)
+      data <- right_join(data, sample_full, by = "eventID")
       data$individualCount <- data$value
       data <- data[,-c(3:5)]
     } else {
