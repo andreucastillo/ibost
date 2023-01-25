@@ -22,7 +22,10 @@ long <- get_database(path = "database", format = "long", taxon_rev = TRUE, xlsx 
 # occurrenceID
 length(unique(long$occurrenceID)) == nrow(long) # it should be true. Avoid repeated occurrenceIDs
 
-# sampleID
+# collectioCodeID
+length(unique(long$collectionCode)) # number of sources
+
+# eventID
 length(unique(long$eventID)) == nrow(wide$sample) # the same in the wide format
 length(unique(long$eventID)) == nrow(wide$community) # the same in the wide format
 length(unique(long$eventID)) == nrow(wide$environment) # the same in the wide format
