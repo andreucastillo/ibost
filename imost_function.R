@@ -21,7 +21,7 @@ load_database <- function(path = "database"){
     community[[i]] <- read_excel(files[i], sheet = "community")
     environment[[i]] <- read_excel(files[i], sheet = "environment")
     taxonomy[[i]] <- read_excel(files[i], sheet = "taxonomy")
-    taxonomy[[i]]$datasetID <- unique(sample[[i]]$datasetID)
+    taxonomy[[i]]$collectionCode <- unique(sample[[i]]$collectionCode)
     sample[[i]]$eventDate <- as.Date(sample[[i]]$eventDate)
     sample[[i]]$modified <- as.Date(sample[[i]]$modified)
   }
